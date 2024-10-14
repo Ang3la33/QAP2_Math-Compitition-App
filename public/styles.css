@@ -1,11 +1,19 @@
 body {
-    background: linear-gradient(90deg, rgba(93,142,251,1) 0%, rgba(93,142,251,1) 50%, rgba(0,212,255,1) 100%);
-    height: 100%;
     padding: 0px;
     margin: 0px;
     font-family: 'Lato', sans-serif;
     display: flex;
-    color: #F6F6F6;
+    color: #fff0f0;
+    font-weight: bold;
+    text-transform: capitalize;
+    justify-content: center;
+    align-items: center;
+    background-image: url(./math-pup.webp);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    text-shadow: 8px 8px 16px rgb(0, 0, 0);
 }
 
 .main-content {
@@ -14,15 +22,18 @@ body {
     flex: 1;
     align-items: center;
     flex-direction: column;
+    margin-top: 60px;
+   
 }
 
 .index_container .navigation__container {
     display: flex;
     flex-direction: row;
+    margin-top: 60px;
 }
 
 .index_container .navigation__container a {
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     aspect-ratio: 1;
     display: flex;
     height: 300px;
@@ -35,7 +46,7 @@ body {
 }
 
 .index_container .navigation__container a:link {
-    color: #5d8efb;
+    color: #2161eb;
     text-decoration: none;
 }
   
@@ -43,6 +54,78 @@ body {
     text-decoration: none;
 }
 
+.index_container .navigation__container a:hover {
+    font-size: 30px;
+}
+
 .index_container .navigation__container :last-child {
     margin-right: 0px
+}
+
+.text-shadow {
+    text-shadow: 20px 20px 40px rgb(0, 0, 0);
+}
+
+.bold {
+    font-weight:500;
+}
+
+#move-down {
+    margin-top: 200px;
+}
+
+.math-quiz {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    margin-top: 20px;
+}
+
+.questions {
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    margin-top: 40px;
+    font-size: large;
+}
+
+.quiz {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%; 
+    max-width: 600px; 
+    padding: 20px;
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+}
+
+form label {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+form input {
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+form button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #5d8efb;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+form button:hover {
+    background-color: #4b78d6;
 }
