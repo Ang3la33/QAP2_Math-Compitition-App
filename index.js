@@ -1,10 +1,20 @@
 const express = require('express');
+const session = require('express-session');
 const app = express();
 const port = 3000;
 
 app.set('view engine', 'ejs');
+
+// To track user's scores
 app.use(express.urlencoded({ extended: true })); // For parsing form data
 app.use(express.static('public')); // To serve static files (e.g., CSS)
+
+// Set up session middleware to keep track of users progress
+app.use(session({
+    secret: 'quiz_secret_key',
+    resave: false,
+    saveUninitialized: true,
+}));
 
 // Math questions and solutions
 const questions = [
@@ -20,32 +30,85 @@ const questions = [
     {id: 10, text: "500 - 320", answer: 180}
 ];
 
-//Some routes required for full functionality are missing here. Only get routes should be required
+// Route to render the homepage
 app.get('/', (req, res) => {
     res.render('index');
 });
 
+// Route to start the quiz
 app.get('/quiz', (req, res) => {
-    res.render('quiz', { questions: questions });
+    // reset the session if user is starting a new quiz
+    req.session.correctAnswers = 0;
+    req.session.currentQuestionIndex = 0;
+    req.session.answers = [];
+    res.render('quiz', { question: questions[0], totalQuestions: questions.length });
 });
 
-app.get('/leaderboards', (req,res) => {
-    res.render('leaderboards');
-});
-
-app.get('quiz_complete', (req,res) => {
-    res.render('quiz_complete');
-});
-
-//Handles quiz submissions.
+// Route to handle quiz answers
 app.post('/quiz', (req, res) => {
-    const { answer } = req.body;
-    console.log(`Answer: ${answer}`);
+    const { userAnswer } = req.body;
+    const currentQuestionIndex = req.session.currentQuestionIndex;
+    const currentQuestion = questions[currentQuestionIndex];
 
-    //answer will contain the value the user entered on the quiz page
-    //Logic must be added here to check if the answer is correct, then track the streak and redirect properly
-    //By default we'll just redirect to the homepage again.
-    res.redirect('/');
+    // Check if the users answer is correct
+    const isCorrect = parseInt(userAnswer) === currentQuestion.answer;
+
+    // Record the user's answer
+    req.session.answers.push({
+        question: currentQuestion.text,
+        userAnswer: parseInt(userAnswer),
+        correctAnswer: currentQuestion.answer,
+        isCorrect: isCorrect
+    });
+
+    // If the user's answer is correct, increase the score
+    if (isCorrect) {
+        req.session.correctAnswers += 1;
+    }
+
+    // Move to the next question or complete the quiz
+    req.session.currentQuestionIndex += 1;
+    if (req.session.currentQuestionIndex < questions.length) {
+        res.render('quiz', {
+            question: questions[req.session.currentQuestionIndex],
+            totalQuestions: questions.length
+        });
+    } else {
+        // If there are no more questions, redirect to quiz complete
+        res.redirect('/quiz_complete');
+    }
+});
+
+let leaderboards = [];
+
+// Route for quiz complete page
+app.get('/quiz_complete', (req, res) => {
+    // Add the current users streak to leaderboard
+    leaderboards.push({
+        correctAnswers: req.session.correctAnswers,
+        totalQuestions: questions.length,
+        // Store date completed
+        date: new Date().toLocaleString()
+    });
+
+    // Sort leaderboard to show highest streaks first
+    leaderboards.sort((a, b) => b.correctAnswers - a.correctAnswers);
+
+    // Keep only top 10 streaks
+    if (leaderboards.length > 10) {
+        leaderboards = leaderboards.slice(0, 10);
+    }
+
+    res.render('quiz_complete', {
+        correctAnswers: req.session.correctAnswers,
+        totalQuestions: questions.length,
+        answers: req.session.answers
+    });
+});
+
+// Route for leaderboards
+app.get('/leaderboards', (req, res) => {
+    res.render('leaderboards', { leaderboards });
 });
 
 // Start the server
