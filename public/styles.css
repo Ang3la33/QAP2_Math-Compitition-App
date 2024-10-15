@@ -13,7 +13,7 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-color: rgba(0, 0, 0, 0.4);  
+    background-color: rgba(0, 0, 0, 0.77);  
     background-blend-mode: multiply;
     text-shadow: 8px 8px 16px rgb(0, 0, 0);
 }

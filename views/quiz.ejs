@@ -6,6 +6,10 @@
     <!-- Dynamically display the question -->
     <p>Question: <%= question.text %></p>
 
+    <% if (errorMessage) { %>
+        <p style="color: red;"><%= errorMessage %></p>
+    <% } %>
+
     <form action="/quiz" method="POST">
         <label for="userAnswer" class="text-shadow">Your Answer:</label>
         <!-- Make sure the input name matches what the server expects -->

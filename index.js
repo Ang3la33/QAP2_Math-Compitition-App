@@ -16,28 +16,23 @@ app.use(session({
     saveUninitialized: true,
 }));
 
+let leaderboards = [];
+
 // Function to generate math question
-function generateQuestion() {
+function getQuestion() {
     const operators = ['+', '-', '*', '/'];
     const operator = operators[Math.floor(Math.random() * operators.length)];
-    
-    let num1, num2;
 
-    // Generate numbers based on the operation type
+    let num1 = Math.floor(Math.random() * 100) + 1;
+    let num2 = Math.floor(Math.random() * 100) + 1;
+
     if (operator === '/') {
-        // Ensure division results in an integer (avoid decimals)
-        num1 = Math.floor(Math.random() * 100) + 1;
-        num2 = Math.floor(Math.random() * 10) + 1;
-        num1 = num1 * num2;  // Make num1 divisible by num2
-    } else {
-        num1 = Math.floor(Math.random() * 100) + 1;
-        num2 = Math.floor(Math.random() * 100) + 1;
+        num1 = num1 * num2; // Ensure num1 is divisible by num2 for integer division
     }
 
     const questionText = `${num1} ${operator} ${num2}`;
     let answer;
 
-    // Calculate the answer based on the operation
     switch (operator) {
         case '+':
             answer = num1 + num2;
@@ -55,13 +50,13 @@ function generateQuestion() {
 
     return { text: questionText, answer: answer };
 }
-
 // Function to check the answer
-function checkAnswer(question, userAnswer) {
+function isCorrectAnswer(question, userAnswer) {
+    console.log("Checking answer:", question, userAnswer);
     return parseInt(userAnswer) === question.answer;
 }
 
-
+module.exports = { getQuestion, isCorrectAnswer };
 
 // Route to render the homepage
 app.get('/', (req, res) => {
@@ -79,24 +74,31 @@ app.get('/quiz', (req, res) => {
     req.session.answers = [];
     
     // Generate the first question dynamically
-    const firstQuestion = generateQuestion();
+    const firstQuestion = getQuestion();
     req.session.currentQuestion = firstQuestion;  
 
     res.render('quiz', {
         question: firstQuestion,
-        totalQuestions: null 
+        totalQuestions: null
     });
 });
 
-// Route to handle quiz answers (POST request)
 // Route to handle quiz answers (POST request)
 app.post('/quiz', (req, res) => {
     const { userAnswer } = req.body;
     const currentQuestion = req.session.currentQuestion;
 
-    // Check if the currentQuestion exists (to avoid TypeError)
+    // Check if the currentQuestion exists
     if (!currentQuestion) {
-        return res.redirect('/quiz');  // Handle the case where the question is not in session
+        return res.redirect('/quiz'); 
+    }
+
+    if (isNaN(userAnswer) || userAnswer.trim() === '') {
+        return res.render('quiz', {
+            question: currentQuestion,
+            totalQuestions: null,
+            errorMessage: "Please enter a valid number."  
+        });
     }
 
     // Check if the user's answer is correct using the checkAnswer function
@@ -115,7 +117,7 @@ app.post('/quiz', (req, res) => {
         req.session.correctAnswers += 1;
 
         // Generate the next question dynamically
-        const nextQuestion = generateQuestion();
+        const nextQuestion = getQuestion();
         req.session.currentQuestion = nextQuestion;
 
         res.render('quiz', {
@@ -128,9 +130,6 @@ app.post('/quiz', (req, res) => {
     }
 });
 
-
-
-let leaderboards = [];
 
 // Route for quiz complete page
 app.get('/quiz_complete', (req, res) => {
