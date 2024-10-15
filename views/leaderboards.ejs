@@ -3,5 +3,21 @@
 <html>
     <body>
         <h1>Leaderboards</h1>
+        <table>
+            <tr>
+                <th>Rank</th>
+                <th>Correct Answers</th>
+                <th>Total Questions</th>
+                <th>Date</th>
+            </tr>
+            <% leaderboards.forEach((entry, index) => { %>
+                <tr>
+                    <td><%= index + 1 %></td>
+                    <td><%= entry.correctAnswers %></td>
+                    <td><%= entry.totalQuestions %></td>
+                    <td><%= entry.date %></td>
+                </tr>
+            <% }) %>
+        </table>
     </body>
 </html>

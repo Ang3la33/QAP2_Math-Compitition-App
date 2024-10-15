@@ -1,16 +1,18 @@
-<!-- The header ejs template is included to ensure our CSS and fonts are loaded -->
 <%- include('partials/header') %>
 <div class="quiz">
-    <!-- Display question or whatever else here -->
     <h1 class="math-quiz">Math Quiz</h1>
     <p class="questions">Answer the question below:</p>
 
+    <!-- Dynamically display the question -->
+    <p><%= question.text %></p>
+
     <form action="/quiz" method="POST">
-        <!-- This handles sending the user's answer back to the server. It's not recommended you modify this, as you shouldn't need to -->
-        <label for="answer" class="text-shadow">Your Answer:</label>
-        <input type="text" id="answer" name="answer" required>
+        <label for="userAnswer" class="text-shadow">Your Answer:</label>
+        <!-- Make sure the input name matches what the server expects -->
+        <input type="text" id="userAnswer" name="userAnswer" required>
         <button type="submit">Submit</button>
     </form>
 </div>
+
 </body>
 </html>
