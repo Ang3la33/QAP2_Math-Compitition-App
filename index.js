@@ -16,42 +16,91 @@ app.use(session({
     saveUninitialized: true,
 }));
 
-// Math questions and solutions
-const questions = [
-    {id: 1, text: "25 + 37", answer: 62},
-    {id: 2, text: "89 - 54", answer: 35},
-    {id: 3, text: "12 x 9", answer: 108},
-    {id: 4, text: "144 / 12", answer: 12},
-    {id: 5, text: "102 + 58", answer: 160},
-    {id: 6, text: "200 - 75", answer: 125},
-    {id: 7, text: "15 x 6", answer: 90},
-    {id: 8, text: "81 / 9", answer: 9},
-    {id: 9, text: "350 + 225", answer: 575},
-    {id: 10, text: "500 - 320", answer: 180}
-];
+// Function to generate math question
+function generateQuestion() {
+    const operators = ['+', '-', '*', '/'];
+    const operator = operators[Math.floor(Math.random() * operators.length)];
+    
+    let num1, num2;
+
+    // Generate numbers based on the operation type
+    if (operator === '/') {
+        // Ensure division results in an integer (avoid decimals)
+        num1 = Math.floor(Math.random() * 100) + 1;
+        num2 = Math.floor(Math.random() * 10) + 1;
+        num1 = num1 * num2;  // Make num1 divisible by num2
+    } else {
+        num1 = Math.floor(Math.random() * 100) + 1;
+        num2 = Math.floor(Math.random() * 100) + 1;
+    }
+
+    const questionText = `${num1} ${operator} ${num2}`;
+    let answer;
+
+    // Calculate the answer based on the operation
+    switch (operator) {
+        case '+':
+            answer = num1 + num2;
+            break;
+        case '-':
+            answer = num1 - num2;
+            break;
+        case '*':
+            answer = num1 * num2;
+            break;
+        case '/':
+            answer = num1 / num2;
+            break;
+    }
+
+    return { text: questionText, answer: answer };
+}
+
+// Function to check the answer
+function checkAnswer(question, userAnswer) {
+    return parseInt(userAnswer) === question.answer;
+}
+
+
 
 // Route to render the homepage
 app.get('/', (req, res) => {
-    res.render('index');
+    const lastStreak = req.session.correctAnswers || 0;
+    res.render('index', {
+        correctAnswers: lastStreak,
+        message: lastStreak > 0 ? `Your last streak was ${lastStreak}` : "No streak available"
+    });
 });
 
 // Route to start the quiz
 app.get('/quiz', (req, res) => {
-    // reset the session if user is starting a new quiz
     req.session.correctAnswers = 0;
     req.session.currentQuestionIndex = 0;
     req.session.answers = [];
-    res.render('quiz', { question: questions[0], totalQuestions: questions.length });
+    
+    // Generate the first question dynamically
+    const firstQuestion = generateQuestion();
+    req.session.currentQuestion = firstQuestion;  
+
+    res.render('quiz', {
+        question: firstQuestion,
+        totalQuestions: null 
+    });
 });
 
-// Route to handle quiz answers
+// Route to handle quiz answers (POST request)
+// Route to handle quiz answers (POST request)
 app.post('/quiz', (req, res) => {
     const { userAnswer } = req.body;
-    const currentQuestionIndex = req.session.currentQuestionIndex;
-    const currentQuestion = questions[currentQuestionIndex];
+    const currentQuestion = req.session.currentQuestion;
 
-    // Check if the users answer is correct
-    const isCorrect = parseInt(userAnswer) === currentQuestion.answer;
+    // Check if the currentQuestion exists (to avoid TypeError)
+    if (!currentQuestion) {
+        return res.redirect('/quiz');  // Handle the case where the question is not in session
+    }
+
+    // Check if the user's answer is correct using the checkAnswer function
+    const isCorrect = checkAnswer(currentQuestion, userAnswer);
 
     // Record the user's answer
     req.session.answers.push({
@@ -61,47 +110,49 @@ app.post('/quiz', (req, res) => {
         isCorrect: isCorrect
     });
 
-    // If the user's answer is correct, increase the score
+    // If the answer is correct, continue with the quiz
     if (isCorrect) {
         req.session.correctAnswers += 1;
-    }
 
-    // Move to the next question or complete the quiz
-    req.session.currentQuestionIndex += 1;
-    if (req.session.currentQuestionIndex < questions.length) {
+        // Generate the next question dynamically
+        const nextQuestion = generateQuestion();
+        req.session.currentQuestion = nextQuestion;
+
         res.render('quiz', {
-            question: questions[req.session.currentQuestionIndex],
-            totalQuestions: questions.length
+            question: nextQuestion,
+            totalQuestions: null
         });
     } else {
-        // If there are no more questions, redirect to quiz complete
+        // If the answer is incorrect, redirect to the quiz_complete page
         res.redirect('/quiz_complete');
     }
 });
+
+
 
 let leaderboards = [];
 
 // Route for quiz complete page
 app.get('/quiz_complete', (req, res) => {
-    // Add the current users streak to leaderboard
+    // Add the current user's streak to the leaderboard
     leaderboards.push({
         correctAnswers: req.session.correctAnswers,
-        totalQuestions: questions.length,
-        // Store date completed
-        date: new Date().toLocaleString()
+        totalQuestions: req.session.answers.length, // The number of questions answered
+        date: new Date().toLocaleString() // Store the date completed
     });
 
     // Sort leaderboard to show highest streaks first
     leaderboards.sort((a, b) => b.correctAnswers - a.correctAnswers);
 
-    // Keep only top 10 streaks
+    // Keep only the top 10 streaks
     if (leaderboards.length > 10) {
         leaderboards = leaderboards.slice(0, 10);
     }
 
+    // Render the quiz complete page with the results
     res.render('quiz_complete', {
         correctAnswers: req.session.correctAnswers,
-        totalQuestions: questions.length,
+        totalQuestions: req.session.answers.length, // The number of questions answered
         answers: req.session.answers
     });
 });

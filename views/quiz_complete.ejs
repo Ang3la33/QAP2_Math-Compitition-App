@@ -1,9 +1,32 @@
 <!-- The header ejs template is included to ensure our CSS and fonts are loaded -->
 <%- include('partials/header') %>
 <html>
-    <body>
+<head>
+    <title>Quiz Complete</title>
+</head>
+<body>
+    <div class="quiz-complete-container">
         <h1>Quiz Complete</h1>
-        <p>Your score: <%= score %> out of <%= totalQuestions %></p>
+        <p>Your score: <%= correctAnswers %> out of <%= totalQuestions %></p>
         <p>Thanks for playing!</p>
-    </body>
+
+        <!-- Display answers -->
+        <ul class="answers-list">
+            <% answers.forEach(answer => { %>
+                <li>
+                    <p>Question: <%= answer.question %></p>
+                    <p>Your Answer: <%= answer.userAnswer %></p>
+                    <p>Correct Answer: <%= answer.correctAnswer %></p>
+                    <p>Result: <%= answer.isCorrect ? 'Correct' : 'Incorrect' %></p>
+                </li>
+            <% }) %>
+        </ul>
+
+         <!-- Option to start a new quiz -->
+        <a href="/quiz" class="btn">Start New Quiz</a>
+
+        <!-- Option to view leaderboards -->
+        <a href="/leaderboards" class="btn">View Leaderboards</a>
+    </div>
+</body>
 </html>

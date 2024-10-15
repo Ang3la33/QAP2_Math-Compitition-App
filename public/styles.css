@@ -13,6 +13,8 @@ body {
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
+    background-color: rgba(0, 0, 0, 0.4);  
+    background-blend-mode: multiply;
     text-shadow: 8px 8px 16px rgb(0, 0, 0);
 }
 
@@ -33,7 +35,7 @@ body {
 }
 
 .index_container .navigation__container a {
-    background-color: #ffffff;
+    background-color: #ffffffbe;
     aspect-ratio: 1;
     display: flex;
     height: 300px;
@@ -129,3 +131,91 @@ form button {
 form button:hover {
     background-color: #4b78d6;
 }
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+    background-color: #0056b3;
+}
+
+.leaderboards-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 80%;
+    margin-bottom: 20px;
+}
+
+table, th, td {
+    border: 1px solid white;
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background-color: #5d8efb;
+    color: white;
+}
+
+td {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.quiz-complete-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+    color: #ffffff;
+}
+
+.quiz-complete-container h1 {
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.quiz-complete-container p {
+    font-size: 18px;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.answers-list {
+    list-style-type: none; 
+    padding: 0;
+    margin-bottom: 20px;
+}
+
+.answers-list li {
+    background-color: rgba(255, 255, 255, 0.1); 
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: left;
+    max-width: 600px;
+    width: 100%;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.answers-list p {
+    margin: 5px 0; 
+}
+

@@ -4,13 +4,13 @@
     <p class="questions">Answer the question below:</p>
 
     <!-- Dynamically display the question -->
-    <p><%= question.text %></p>
+    <p>Question: <%= question.text %></p>
 
     <form action="/quiz" method="POST">
         <label for="userAnswer" class="text-shadow">Your Answer:</label>
         <!-- Make sure the input name matches what the server expects -->
         <input type="text" id="userAnswer" name="userAnswer" required>
-        <button type="submit">Submit</button>
+        <button type="submit" class="btn">Submit Answer</button>
     </form>
 </div>
 
